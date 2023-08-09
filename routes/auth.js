@@ -20,7 +20,7 @@ router.post('/login',
       .isAlphanumeric()
       .trim()
   ],
- authController.postLogin);
+ authController.login);
 
 router.post('/signup', 
 check('email').isEmail().withMessage("Please enter a valid email.").custom((value, { req }) => {
@@ -45,7 +45,7 @@ check('email').isEmail().withMessage("Please enter a valid email.").custom((valu
         }
         return true;
       }),
-   authController.postSignup);
+   authController.signup);
 
 router.post('/logout', authController.postLogout);
 

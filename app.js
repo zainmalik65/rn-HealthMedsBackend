@@ -7,12 +7,13 @@ const session = require('express-session');
 const MongoDBStore = require('connect-mongodb-session')(session);
 // const csrf = require('csurf');
 const flash = require('connect-flash');
-
+const multer = require('multer');
 const errorController = require('./controllers/error');
 const User = require('./models/user');
 
 const MONGODB_URI =
 'mongodb+srv://zain1234:zain1234@cluster0.6bdeixw.mongodb.net/shop';
+// 'mongodb+srv://mohsinfayyaz321:reliablemeds@reliablemeds.8ukzjcj.mongodb.net/reliablemeds';
 
 const app = express();
 const store = new MongoDBStore({
@@ -21,13 +22,39 @@ const store = new MongoDBStore({
 });
 // const csrfProtection = csrf();
 
+const fileStorage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, 'images');
+  },
+  filename: (req, file, cb) => {
+    cb(null, new Date().toISOString() + '-' + file.originalname);
+  }
+});
+
+const fileFilter = (req, file, cb) => {
+  if (
+    file.mimetype === 'image/png' ||
+    file.mimetype === 'image/jpg' ||
+    file.mimetype === 'image/jpeg'
+  ) {
+    cb(null, true);
+  } else {
+    cb(null, false);
+  }
+};
+
+// app.use(bodyParser.urlencoded()); // x-www-form-urlencoded <form>
+app.use(
+  multer({ storage: fileStorage, fileFilter: fileFilter }).single('image')
+);
+app.use('/images', express.static(path.join(__dirname, 'images')));
 app.set('view engine', 'ejs');
 app.set('views', 'views');
 
 const adminRoutes = require('./routes/admin');
-const shopRoutes = require('./routes/shop');
+const feedRoutes = require('./routes/feed');
 const authRoutes = require('./routes/auth');
-app.use(express.json());
+app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(
@@ -59,8 +86,18 @@ app.use((req, res, next) => {
 //   next();
 // });
 
+app.use((req, res, next) => {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader(
+    'Access-Control-Allow-Methods',
+    'OPTIONS, GET, POST, PUT, PATCH, DELETE'
+  );
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  next();
+});
+
 app.use('/admin', adminRoutes);
-app.use(shopRoutes);
+app.use(feedRoutes);
 app.use(authRoutes);
 
 app.use(errorController.get404);

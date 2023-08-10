@@ -2,7 +2,7 @@ const path = require('path');
 
 const express = require('express');
 
-const shopController = require('../controllers/shop');
+const shopController = require('../controllers/feed');
 const isAuth = require('../middleware/is-auth');
 
 const router = express.Router();
@@ -10,6 +10,7 @@ const router = express.Router();
 router.get('/', shopController.getIndex);
 
 router.get('/products', shopController.getProducts);
+router.get('/getProductDeals', shopController.getProductDeals);
 
 router.get('/products/:productId', shopController.getProduct);
 

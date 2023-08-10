@@ -1,5 +1,5 @@
 const Product = require('../models/product');
-
+const { validationResult } = require('express-validator/check');
 exports.getAddProduct = (req, res, next) => {
   res.render('admin/edit-product', {
     pageTitle: 'Add Product',
@@ -9,6 +9,8 @@ exports.getAddProduct = (req, res, next) => {
 };
 
 exports.postAddProduct = (req, res, next) => {
+  console.log('[rr',req.body);
+ 
   const title = req.body.title;
   const imageUrl = req.body.imageUrl;
   const price = req.body.price;
@@ -29,6 +31,52 @@ exports.postAddProduct = (req, res, next) => {
     })
     .catch(err => {
       console.log(err);
+    });
+};
+
+exports.createProuct = (req, res, next) => {
+  
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    const error = new Error('Validation failed, entered data is incorrect.');
+    error.statusCode = 422;
+    throw error;
+  }
+
+  console.log('req',req.body);
+  // if (!req.file) {
+  //   const error = new Error('No image provided.');
+  //   error.statusCode = 422;
+  //   throw error;
+  // }
+  // const image = req.file.path;
+  const name = req.body.name;
+  const price = req.body.price;
+  const discountPrice = req.body.discountPrice;
+  const manufacturer = req.body.manufacturer;
+  const brand = req.body.brand;
+  const percentageOff=100 * (price - discountPrice) / price
+  const product = new Product({
+    name: name,
+    price: price,
+    discountPrice:discountPrice,
+    manufacturer:manufacturer,
+    brand:brand,
+    percentageOff:percentageOff,
+    // userId: req.user
+  });
+  product
+    .save()
+    .then(result => {
+      res.status(201).json({
+        message: 'Product created successfully!',
+       product:product});
+    })
+    .catch(err => {
+      if (!err.statusCode) {
+        err.statusCode = 500;
+      }
+      next(err);
     });
 };
 
@@ -78,26 +126,26 @@ exports.postEditProduct = (req, res, next) => {
 };
 
 exports.getProducts = (req, res, next) => {
-  Product.find({ userId: req.user._id })
-    // .select('title price -_id')
-    // .populate('userId', 'name')
-    .then(products => {
-      console.log(products);
-      res.render('admin/products', {
-        prods: products,
-        pageTitle: 'Admin Products',
-        path: '/admin/products'
+
+  Product.find()
+  .then(products => {
+    res.status(201).json({
+      message: 'Products Retrived successfully!',
+      products:products
       });
-    })
-    .catch(err => console.log(err));
+  })
+  .catch(err => {
+    console.log(err);
+  });
 };
 
 exports.postDeleteProduct = (req, res, next) => {
   const prodId = req.body.productId;
-  Product.deleteOne({ _id: prodId, userId: req.user._id })
+  Product.deleteOne({ _id: prodId})
     .then(() => {
-      console.log('DESTROYED PRODUCT');
-      res.redirect('/admin/products');
+      res.status(201).json({
+        message: 'Products Deleted successfully!',
+        });
     })
     .catch(err => console.log(err));
 };

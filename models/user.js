@@ -5,7 +5,8 @@ const Schema = mongoose.Schema;
 const userSchema = new Schema({
   email: {
     type: String,
-    required: true
+    required: true,
+    unique: true
   },
   name: {
     type: String,
@@ -14,6 +15,11 @@ const userSchema = new Schema({
   password: {
     type: String,
     required: true
+  },
+  role: {
+    type: String,
+    enum : ['user','admin'],
+    default: 'user'
   },
   resetToken: String,
   resetTokenExpiration: Date,

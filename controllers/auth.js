@@ -280,7 +280,7 @@ exports.signup = (req, res, next) => {
     error.data = errors.array();
     throw error;
   }
-  const email = req.body.email.toLowerCase();
+  const email = req.body.email;
   const name = req.body.name;
   const password = req.body.password;
   bcrypt
@@ -294,7 +294,7 @@ exports.signup = (req, res, next) => {
       return user.save();
     })
     .then(result => {
-      res.status(201).json({ message: 'User created!', userId: result._id });
+      res.status(201).json({ message: 'User created!', userId: result._id,role:result.role });
     })
     .catch(err => {
       if (!err.statusCode) {
@@ -307,7 +307,7 @@ exports.signup = (req, res, next) => {
 
 exports.login = (req, res, next) => {
 
-  const email = req.body.email.toLowerCase();
+  const email = req.body.email;
   console.log('email',email)
   const password = req.body.password;
   let loadedUser;
@@ -335,7 +335,8 @@ exports.login = (req, res, next) => {
         'somesupersecretsecret',
         { expiresIn: '1h' }
       );
-      res.status(200).json({ token: token, userId: loadedUser._id.toString() });
+      res.status(200).json({ token: token, userId: loadedUser._id.toString(),
+        role:loadedUser.role,name:loadedUser.name });
     })
     .catch(err => {
       if (!err.statusCode) {

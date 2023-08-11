@@ -3,7 +3,7 @@ const path = require('path');
 const express = require('express');
 
 const shopController = require('../controllers/feed');
-const isAuth = require('../middleware/is-auth');
+const isAuth = require('../middleware/IsAuthenticated');
 
 const router = express.Router();
 
@@ -16,7 +16,7 @@ router.get('/products/:productId', shopController.getProduct);
 
 router.get('/cart', isAuth, shopController.getCart);
 
-router.post('/cart', isAuth, shopController.postCart);
+router.post('/cart',isAuth, shopController.postCart);
 
 router.post('/cart-delete-item', isAuth, shopController.postCartDeleteProduct);
 

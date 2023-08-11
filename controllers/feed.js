@@ -54,24 +54,25 @@ exports.getCart = (req, res, next) => {
     .execPopulate()
     .then(user => {
       const products = user.cart.items;
-      res.render('shop/cart', {
-        path: '/cart',
-        pageTitle: 'Your Cart',
-        products: products
-      });
+      res.status(201).json({
+        message: 'Cart Retrived Sucessfully',
+        products:products
+        });
     })
     .catch(err => console.log(err));
 };
 
 exports.postCart = (req, res, next) => {
+  console.log(req.userId);
   const prodId = req.body.productId;
   Product.findById(prodId)
     .then(product => {
       return req.user.addToCart(product);
     })
     .then(result => {
-      console.log(result);
-      res.redirect('/cart');
+      res.status(201).json({
+        message: 'Product successfully added to cart!',
+        });
     });
 };
 
@@ -80,7 +81,9 @@ exports.postCartDeleteProduct = (req, res, next) => {
   req.user
     .removeFromCart(prodId)
     .then(result => {
-      res.redirect('/cart');
+      res.status(201).json({
+        message: 'Product successfully removed from cart!',
+        });
     })
     .catch(err => console.log(err));
 };

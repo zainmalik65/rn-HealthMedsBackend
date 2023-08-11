@@ -10,7 +10,7 @@ const flash = require('connect-flash');
 const multer = require('multer');
 const errorController = require('./controllers/error');
 const User = require('./models/user');
-
+const { v4: uuidv4 } = require('uuid');
 const MONGODB_URI =
 'mongodb+srv://zain1234:zain1234@cluster0.6bdeixw.mongodb.net/shop';
 // 'mongodb+srv://mohsinfayyaz321:reliablemeds@reliablemeds.8ukzjcj.mongodb.net/reliablemeds';
@@ -27,7 +27,7 @@ const fileStorage = multer.diskStorage({
     cb(null, 'images');
   },
   filename: (req, file, cb) => {
-    cb(null, new Date().toISOString() + '-' + file.originalname);
+    cb(null, uuidv4())
   }
 });
 
@@ -43,10 +43,9 @@ const fileFilter = (req, file, cb) => {
   }
 };
 
-// app.use(bodyParser.urlencoded()); // x-www-form-urlencoded <form>
 app.use(
-  multer({ storage: fileStorage, fileFilter: fileFilter }).single('image')
-);
+  multer({storage:fileStorage,fileFilter:fileFilter}).single('image')
+)
 app.use('/images', express.static(path.join(__dirname, 'images')));
 app.set('view engine', 'ejs');
 app.set('views', 'views');

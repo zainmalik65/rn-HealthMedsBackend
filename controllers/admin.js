@@ -103,25 +103,49 @@ exports.getEditProduct = (req, res, next) => {
 };
 
 exports.postEditProduct = (req, res, next) => {
+  console.log('bidu',req.body)
   const prodId = req.body.productId;
-  const updatedTitle = req.body.title;
+  console.log('[rr',prodId)
+  const updatedName = req.body.name;
   const updatedPrice = req.body.price;
-  const updatedImageUrl = req.body.imageUrl;
-  const updatedDesc = req.body.description;
+  const updateddiscountPrice = req.body.discountPrice;
+  const UpdatedManufacturer = req.body.manufacturer;
+  const updatedBrand = req.body.brand;
+  const updatedPercentageOff=100 * (updatedPrice - updateddiscountPrice) / updatedPrice;
+  let updatedimageUrl;
+  if(req.file){
+    updatedimageUrl = req.file.path;
+  }
 
   Product.findById(prodId)
     .then(product => {
-      if (product.userId.toString() !== req.user._id.toString()) {
-        return res.redirect('/');
+      console.log('prrr',product)
+      if(product){
+      product.name=updatedName;
+      product.price= updatedPrice;
+      product.discountPrice=updateddiscountPrice;
+      product.manufacturer=UpdatedManufacturer;
+      product.brand=updatedBrand;
+      product.percentageOff=updatedPercentageOff;
+      if(updatedimageUrl){
+        product.image=updatedimageUrl
       }
-      product.title = updatedTitle;
-      product.price = updatedPrice;
-      product.description = updatedDesc;
-      product.imageUrl = updatedImageUrl;
+      console.log('prrr',product)
       return product.save().then(result => {
-        console.log('UPDATED PRODUCT!');
-        res.redirect('/admin/products');
+        res.status(201).json({
+          message: 'Product updated successfully!',
+          success:true,
+          product:product
+        });
       });
+      }
+      else{
+        res.status(201).json({
+          message: 'Product not found!',
+          success:false
+        });
+      }
+      
     })
     .catch(err => console.log(err));
 };

@@ -22,7 +22,15 @@ module.exports = async (req, res, next) => {
   }
   req.userId = decodedToken.userId;
   req.user=await user.findById(req.userId).then(resUser=>{
+    if(resUser.role=='admin')
+    { 
     return resUser
-  })
+    }
+    else{
+      const error = new Error('Not authenticated.');
+    error.statusCode = 401;
+    throw error;
+    }
+    })
   next();
 };

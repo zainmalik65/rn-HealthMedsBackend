@@ -37,7 +37,7 @@ const userSchema = new Schema({
   }
 });
 
-userSchema.methods.addToCart = function(product) {
+userSchema.methods.addToCart = function(product,quantity=0) {
   const cartProductIndex = this.cart.items.findIndex(cp => {
     return cp.productId.toString() === product._id.toString();
   });
@@ -45,7 +45,12 @@ userSchema.methods.addToCart = function(product) {
   const updatedCartItems = [...this.cart.items];
 
   if (cartProductIndex >= 0) {
-    newQuantity = this.cart.items[cartProductIndex].quantity + 1;
+    if(quantity>0){
+      newQuantity = quantity;  
+    }
+    else{
+      newQuantity = this.cart.items[cartProductIndex].quantity + 1;
+    }
     updatedCartItems[cartProductIndex].quantity = newQuantity;
   } else {
     updatedCartItems.push({
@@ -61,9 +66,11 @@ userSchema.methods.addToCart = function(product) {
 };
 
 userSchema.methods.removeFromCart = function(productId) {
+  console.log('prrr',productId)
   const updatedCartItems = this.cart.items.filter(item => {
     return item.productId.toString() !== productId.toString();
   });
+  console.log('updated',this.cart.items)
   this.cart.items = updatedCartItems;
   return this.save();
 };

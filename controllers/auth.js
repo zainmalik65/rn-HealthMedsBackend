@@ -294,7 +294,12 @@ exports.signup = (req, res, next) => {
       return user.save();
     })
     .then(result => {
-      res.status(201).json({ message: 'User created!', userId: result._id,role:result.role });
+      res.status(201).json({ 
+        success:true,
+        message: 'User created successfully!', 
+        userId: result._id,
+        role:result.role 
+      });
     })
     .catch(err => {
       if (!err.statusCode) {
@@ -332,11 +337,16 @@ exports.login = (req, res, next) => {
           email: loadedUser.email,
           userId: loadedUser._id.toString()
         },
-        'somesupersecretsecret',
-        { expiresIn: '1h' }
+        'secretkey',
+        { expiresIn: '6h' }
       );
-      res.status(200).json({ token: token, userId: loadedUser._id.toString(),
-        role:loadedUser.role,name:loadedUser.name });
+      res.status(200).json({ 
+        success:true,
+        token: token, 
+        userId: loadedUser._id.toString(),
+        role:loadedUser.role,
+        name:loadedUser.name 
+      });
     })
     .catch(err => {
       if (!err.statusCode) {

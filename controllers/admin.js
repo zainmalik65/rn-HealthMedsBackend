@@ -1,4 +1,5 @@
 const Product = require('../models/product');
+const Order = require('../models/order');
 const { validationResult } = require('express-validator/check');
 
 
@@ -148,6 +149,18 @@ exports.postDeleteProduct = (req, res, next) => {
       res.status(201).json({
         message: 'Products Deleted successfully!',
         });
+    })
+    .catch(err => console.log(err));
+};
+
+exports.getOrders = (req, res, next) => {
+  Order.find()
+    .then(orders => {
+       res.status(201).json({
+        message: 'Order retrived successfully',
+        success:true,
+        orders:orders
+    })
     })
     .catch(err => console.log(err));
 };

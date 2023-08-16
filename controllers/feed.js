@@ -165,3 +165,17 @@ exports.getOrders = (req, res, next) => {
     })
     .catch(err => console.log(err));
 };
+
+exports.getOrder = (req, res, next) => {
+  const orderId = req.params.orderId.toString();
+  Order.findById(orderId)
+    .then(order => {
+      res.status(201).json({
+        message: 'Order Retrived successfully!',
+        success:true,
+        order:order
+        });
+    })
+    .catch(err => console.log(err));
+};
+

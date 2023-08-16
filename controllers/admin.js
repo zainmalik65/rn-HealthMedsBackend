@@ -1,38 +1,8 @@
 const Product = require('../models/product');
 const { validationResult } = require('express-validator/check');
-exports.getAddProduct = (req, res, next) => {
-  res.render('admin/edit-product', {
-    pageTitle: 'Add Product',
-    path: '/admin/add-product',
-    editing: false
-  });
-};
 
-exports.postAddProduct = (req, res, next) => {
-  console.log('[rr',req.body);
- 
-  const title = req.body.title;
-  const imageUrl = req.body.imageUrl;
-  const price = req.body.price;
-  const description = req.body.description;
-  const product = new Product({
-    title: title,
-    price: price,
-    description: description,
-    imageUrl: imageUrl,
-    userId: req.user
-  });
-  product
-    .save()
-    .then(result => {
-      // console.log(result);
-      console.log('Created Product');
-      res.redirect('/admin/products');
-    })
-    .catch(err => {
-      console.log(err);
-    });
-};
+
+
 
 exports.createProuct = (req, res, next) => {
   
@@ -43,7 +13,7 @@ exports.createProuct = (req, res, next) => {
     throw error;
   }
 
-  console.log('req',req.body);
+  
   if (!req.file) {
     const error = new Error('No image provided.');
     error.statusCode = 422;
@@ -55,15 +25,40 @@ exports.createProuct = (req, res, next) => {
   const discountPrice = req.body.discountPrice;
   const manufacturer = req.body.manufacturer;
   const brand = req.body.brand;
-  const percentageOff=100 * (price - discountPrice) / price
+  const type=req.body.type;
+  const quantity=req.body.quantity;
+  const percentageOff=100 * (price - discountPrice) / price;
+  let productSizes=[];
+  if(req.body.sizes){
+    req.body.sizes.forEach((size,index) => {
+        productSizes.push({id:index,size:size})
+    });
+  }
+  let productColors=[];
+  if(req.body.colors){
+    req.body.colors.forEach((color,index) => {
+      productColors.push({id:index,color:color})
+    });
+  }
+  let productFlavours=[];
+  if(req.body.flavours){
+    req.body.flavours.forEach((flavor,index) => {
+      productFlavours.push({id:index,flavour:flavor})
+    });
+  }
   const product = new Product({
     name: name,
     price: price,
     discountPrice:discountPrice,
     image:imageUrl,
     manufacturer:manufacturer,
+    type:type,
     brand:brand,
     percentageOff:percentageOff,
+    quantity:quantity,
+    sizes:productSizes,
+    colors:productColors,
+    flavours:productFlavours
     // userId: req.user
   });
   product
@@ -81,36 +76,17 @@ exports.createProuct = (req, res, next) => {
     });
 };
 
-exports.getEditProduct = (req, res, next) => {
-  const editMode = req.query.edit;
-  if (!editMode) {
-    return res.redirect('/');
-  }
-  const prodId = req.params.productId;
-  Product.findById(prodId)
-    .then(product => {
-      if (!product) {
-        return res.redirect('/');
-      }
-      res.render('admin/edit-product', {
-        pageTitle: 'Edit Product',
-        path: '/admin/edit-product',
-        editing: editMode,
-        product: product
-      });
-    })
-    .catch(err => console.log(err));
-};
+
 
 exports.postEditProduct = (req, res, next) => {
-  console.log('bidu',req.body)
   const prodId = req.body.productId;
-  console.log('[rr',prodId)
+
   const updatedName = req.body.name;
   const updatedPrice = req.body.price;
   const updateddiscountPrice = req.body.discountPrice;
   const UpdatedManufacturer = req.body.manufacturer;
   const updatedBrand = req.body.brand;
+  const updatedtype=req.body.type;
   const updatedPercentageOff=100 * (updatedPrice - updateddiscountPrice) / updatedPrice;
   let updatedimageUrl;
   if(req.file){
@@ -127,6 +103,7 @@ exports.postEditProduct = (req, res, next) => {
       product.manufacturer=UpdatedManufacturer;
       product.brand=updatedBrand;
       product.percentageOff=updatedPercentageOff;
+      type=updatedtype;
       if(updatedimageUrl){
         product.image=updatedimageUrl
       }

@@ -167,7 +167,7 @@ exports.getOrders = (req, res, next) => {
 };
 
 exports.getOrder = (req, res, next) => {
-  const orderId = req.params.orderId.toString();
+  const orderId = req.params.orderId;
   Order.findById(orderId)
     .then(order => {
       res.status(201).json({
